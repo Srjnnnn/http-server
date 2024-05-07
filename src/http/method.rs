@@ -25,6 +25,7 @@ impl FromStr for Method {
             "CONNECT" => Ok(Self::CONNECT),
             "TRACE" => Ok(Self::TRACE),
             "PATCH" => Ok(Self::PATCH),
+            "OPTION" => Ok(Self::OPTIONS),
             _ => Err(MethodError),
         }
     }
