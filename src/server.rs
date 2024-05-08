@@ -1,13 +1,7 @@
 pub mod server {
-    use crate::http::request;
     use crate::http::Request;
-    use rand::Error;
     use std::convert::TryFrom;
-    use std::convert::TryInto;
-    use std::{
-        io::Read,
-        net::{TcpListener, TcpStream},
-    };
+    use std::{io::Read, net::TcpListener};
 
     pub struct Server {
         addr: String,
@@ -32,7 +26,7 @@ pub mod server {
                                 println!("Received a request: {}", String::from_utf8_lossy(&buf));
 
                                 match Request::try_from(&buf as &[u8]) {
-                                    Ok(request) => {}
+                                    Ok(_request) => {}
                                     Err(e) => println!("Failed to parse the error: {}", e),
                                 }
                             }

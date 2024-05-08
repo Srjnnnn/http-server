@@ -1,21 +1,19 @@
-use crate::http::{method, request};
-
 use super::method::{Method, MethodError};
 use std::convert::TryFrom;
 use std::error::Error;
 use std::fmt::{Debug, Result as FmtResult};
 use std::fmt::{Display, Formatter};
 use std::str::{self, Utf8Error};
-pub struct Request {
-    path: String,
-    query_string: Option<String>,
+pub struct Request<'buf> {
+    path: &'buf str,
+    query_string: Option<&'buf str>,
     method: Method,
 }
 
-impl TryFrom<&[u8]> for Request {
+impl<'buf> TryFrom<&'buf [u8]> for Request<'buf> {
     type Error = ParseError;
 
-    fn try_from(buf: &[u8]) -> Result<Self, Self::Error> {
+    fn try_from(buf: &'buf [u8]) -> Result<Self, Self::Error> {
         let request = str::from_utf8(buf)?;
 
         // match parse_sentence(request) {
@@ -23,9 +21,9 @@ impl TryFrom<&[u8]> for Request {
         //     None => return Err(ParseError::InvalidRequest),
         // }
 
-        let (method, request) = parse_sentence((request)).ok_or(ParseError::InvalidRequest)?;
-        let (mut path, request) = parse_sentence((request)).ok_or(ParseError::InvalidRequest)?;
-        let (protocol, _) = parse_sentence((request)).ok_or(ParseError::InvalidRequest)?;
+        let (method, request) = parse_sentence(request).ok_or(ParseError::InvalidRequest)?;
+        let (mut path, request) = parse_sentence(request).ok_or(ParseError::InvalidRequest)?;
+        let (protocol, _) = parse_sentence(request).ok_or(ParseError::InvalidRequest)?;
 
         if protocol != "HTTP/1.1" {
             return Err(ParseError::InvalidProtocol);
@@ -39,7 +37,11 @@ impl TryFrom<&[u8]> for Request {
             path = &path[..i];
         }
 
-        unimplemented!()
+        Ok(Self {
+            path: path,
+            query_string,
+            method,
+        })
     }
 }
 

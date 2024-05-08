@@ -1,6 +1,4 @@
 use crate::server::server::Server;
-use http::Method;
-use http::Request;
 
 mod http;
 mod server;
